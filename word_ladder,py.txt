@@ -1,0 +1,43 @@
+class Solution:
+    def findLadders(self, beginWord: str, endWord: str, wordList: List[str]) -> List[List[str]]:
+        from collections import defaultdict, deque
+        from typing import List
+        wordSet = set(wordList)
+        if endWord not in wordSet:
+            return []
+
+        graph = defaultdict(list)
+        level = {beginWord}
+        found = False
+
+        while level and not found:
+            next_level = set()
+            wordSet -= level
+
+            for word in level:
+                for i in range(len(word)):
+                    for c in "abcdefghijklmnopqrstuvwxyz":
+                        newWord = word[:i] + c + word[i + 1:]
+                        if newWord in wordSet:
+                            graph[word].append(newWord)
+                            next_level.add(newWord)
+                            if newWord == endWord:
+                                found = True
+
+            level = next_level
+
+        res = []
+        path = [beginWord]
+
+        def dfs(word):
+            if word == endWord:
+                res.append(path[:])
+                return
+
+            for nxt in graph[word]:
+                path.append(nxt)
+                dfs(nxt)
+                path.pop()
+
+        dfs(beginWord)
+        return res
